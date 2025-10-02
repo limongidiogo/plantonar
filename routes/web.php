@@ -37,6 +37,9 @@ use App\Http\Controllers\PlantaoController;
 
 // Adicionar este grupo de rotas no final do arquivo
 Route::middleware(['auth', 'verified'])->group(function () {
+    // Rota para a página de gerenciamento de documentos
+    Route::get('/profile/documents', [ProfileController::class, 'documents'])->name('profile.documents');
+
     // Rota para o médico ver seus plantões agendados e candidaturas
     Route::get('/minhas-candidaturas', [ProfileController::class, 'myCandidacies'])->name('profile.candidacies');
 

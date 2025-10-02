@@ -14,14 +14,24 @@
         </div>
     @endif
     
-    {{-- Bloco para exibir mensagens de erro --}}
+   {{-- Bloco para exibir mensagens de erro --}}
     @if (session('error'))
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 py-2">
             <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
                 <span class="block sm:inline">{{ session('error') }}</span>
+                
+                {{-- ================================================================== --}}
+                {{-- == MELHORIA: Adiciona um link útil se o erro for de perfil incompleto == --}}
+                {{-- ================================================================== --}}
+                @if (Str::contains(session('error'), 'perfil precisa estar completo'))
+                    <a href="{{ route('profile.edit') }}" class="font-bold underline ml-2">Clique aqui para completar.</a>
+                @endif
+                {{-- ================================================================== --}}
+
             </div>
         </div>
     @endif
+
 
 
     <div class="py-12">

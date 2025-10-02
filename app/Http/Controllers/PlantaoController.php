@@ -71,21 +71,32 @@ class PlantaoController extends Controller
         /**
          * Aplica o médico logado a um plantão.
          */
-            public function apply(Plantao $plantao): RedirectResponse
-            {
-                $medicoProfile = Auth::user()->profile;
+        public function apply(Plantao $plantao): RedirectResponse
+        {
+            $medicoProfile = Auth::user()->profile;
 
-                // VERIFICAÇÃO: Checa se o médico já se candidatou a este plantão
-                if ($plantao->candidates()->where('profile_id', $medicoProfile->id)->exists()) {
-                    // Se já existe, redireciona de volta com uma mensagem de erro/aviso
-                    return redirect()->route('plantoes.index')->with('error', 'Você já se candidatou para este plantão.');
-                }
-
-                // Se não existe, anexa o perfil do médico aos candidatos do plantão
-                $plantao->candidates()->attach($medicoProfile->id);
-
-                return redirect()->route('plantoes.index')->with('success', 'Você se candidatou para o plantão com sucesso!');
+            // ==================================================================
+            // == PASSO 2: O "PORTÃO" DA CANDIDATURA (LOCAL CORRETO) ==
+            // ==================================================================
+            // Verifica se o perfil do médico está pronto para se candidatar.
+            if (!$medicoProfile->isReadyToApply()) {
+                // Se não estiver pronto, redireciona de volta com uma mensagem de erro/aviso.
+                return redirect()->back()->with('error', 'Para se candidatar, seu perfil precisa estar completo. Por favor, atualize suas informações.');
             }
+            // ==================================================================
+
+            // VERIFICAÇÃO: Checa se o médico já se candidatou a este plantão
+            if ($plantao->candidates()->where('profile_id', $medicoProfile->id)->exists()) {
+                // Se já existe, redireciona de volta com uma mensagem de erro/aviso
+                return redirect()->route('plantoes.index')->with('error', 'Você já se candidatou para este plantão.');
+            }
+
+            // Se não existe, anexa o perfil do médico aos candidatos do plantão
+            $plantao->candidates()->attach($medicoProfile->id);
+
+            return redirect()->route('plantoes.index')->with('success', 'Você se candidatou para o plantão com sucesso!');
+        }
+
 
         /**
          * Exibe os plantões publicados pelo hospital logado.

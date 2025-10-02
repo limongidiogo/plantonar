@@ -76,6 +76,40 @@
             </div>
         @endif
 
+        {{-- =============================================================== --}}
+        {{-- == INÍCIO DO BLOCO DE INFORMAÇÕES PESSOAIS ESSENCIAIS == --}}
+        {{-- =============================================================== --}}
+
+        <div class="mt-6 border-t border-gray-200 pt-6">
+            <h3 class="text-lg font-medium text-gray-900">Informações Pessoais</h3>
+            <p class="mt-1 text-sm text-gray-600">Preencha seus dados para completar seu perfil.</p>
+        </div>
+
+        <div class="mt-4">
+            <x-input-label for="data_nascimento" :value="__('Data de Nascimento')" />
+            <x-text-input id="data_nascimento" name="data_nascimento" type="date" class="mt-1 block w-full" :value="old('data_nascimento', $profile->data_nascimento)" />
+            <x-input-error class="mt-2" :messages="$errors->get('data_nascimento')" />
+        </div>
+
+        <div class="mt-4">
+            <x-input-label for="cpf" :value="__('CPF')" />
+            <x-text-input id="cpf" name="cpf" type="text" class="mt-1 block w-full" :value="old('cpf', $profile->cpf)" />
+            <x-input-error class="mt-2" :messages="$errors->get('cpf')" />
+        </div>
+
+        <div class="mt-4">
+            <x-input-label for="telefone_celular" :value="__('Telefone Celular (WhatsApp)')" />
+            <x-text-input id="telefone_celular" name="telefone_celular" type="text" class="mt-1 block w-full" :value="old('telefone_celular', $profile->telefone_celular)" />
+            <x-input-error class="mt-2" :messages="$errors->get('telefone_celular')" />
+        </div>
+
+        <div class="mt-4">
+            <x-input-label for="endereco_completo" :value="__('Endereço Completo')" />
+            <textarea id="endereco_completo" name="endereco_completo" class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full">{{ old('endereco_completo', $profile->endereco_completo) }}</textarea>
+            <x-input-error class="mt-2" :messages="$errors->get('endereco_completo')" />
+        </div>
+
+
         <div class="flex items-center gap-4">
             <x-primary-button>{{ __('Save') }}</x-primary-button>
 
