@@ -30,7 +30,17 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('profiles', function (Blueprint $table) {
-            //
+            // Remove as colunas se a migration for revertida
+            $table->dropColumn([
+                'data_nascimento',
+                'cpf',
+                'rg',
+                'estado_civil',
+                'nacionalidade',
+                'endereco_completo',
+                'telefone_celular',
+            ]);
+
         });
     }
 };

@@ -92,8 +92,5 @@ class Profile extends Model
         return $this->hasMany(Documento::class);
     }
 
-    
-
-
 }
 
