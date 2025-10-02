@@ -46,6 +46,35 @@
                 </div>
             @endif
         </div>
+        {{-- Verifica o tipo de usuário a partir do perfil --}}
+        @if ($profile->user_type === 'medico')
+            {{-- Campos para o Médico --}}
+            <div class="mt-4">
+                <x-input-label for="crm" :value="__('CRM')" />
+                <x-text-input id="crm" name="crm" type="text" class="mt-1 block w-full" :value="old('crm', $profile->crm)" required autofocus autocomplete="crm" />
+                <x-input-error class="mt-2" :messages="$errors->get('crm')" />
+            </div>
+
+            <div class="mt-4">
+                <x-input-label for="specialty" :value="__('Especialidade')" />
+                <x-text-input id="specialty" name="specialty" type="text" class="mt-1 block w-full" :value="old('specialty', $profile->specialty)" required autofocus autocomplete="specialty" />
+                <x-input-error class="mt-2" :messages="$errors->get('specialty')" />
+            </div>
+
+        @elseif ($profile->user_type === 'hospital')
+            {{-- Campos para o Hospital --}}
+            <div class="mt-4">
+                <x-input-label for="hospital_name" :value="__('Nome do Hospital')" />
+                <x-text-input id="hospital_name" name="hospital_name" type="text" class="mt-1 block w-full" :value="old('hospital_name', $profile->hospital_name)" required autofocus autocomplete="organization" />
+                <x-input-error class="mt-2" :messages="$errors->get('hospital_name')" />
+            </div>
+
+            <div class="mt-4">
+                <x-input-label for="cnpj" :value="__('CNPJ')" />
+                <x-text-input id="cnpj" name="cnpj" type="text" class="mt-1 block w-full" :value="old('cnpj', $profile->cnpj)" required autofocus autocomplete="organization-id" />
+                <x-input-error class="mt-2" :messages="$errors->get('cnpj')" />
+            </div>
+        @endif
 
         <div class="flex items-center gap-4">
             <x-primary-button>{{ __('Save') }}</x-primary-button>

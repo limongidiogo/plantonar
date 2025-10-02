@@ -8,6 +8,7 @@ use App\Models\Plantao;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Profile;
+use App\Notifications\MedicoAprovadoNotification;
 
 
 
@@ -116,26 +117,27 @@ class PlantaoController extends Controller
        /**
          * Aprova um candidato para um plantão.
          */
-        public function approve(Plantao $plantao, Profile $candidate): RedirectResponse
+       public function approve(Plantao $plantao, Profile $candidate): RedirectResponse
         {
-            // VERIFICAÇÃO: Impede a aprovação se o plantão não estiver 'disponivel'
             if ($plantao->status !== 'disponivel') {
                 return redirect()->route('plantoes.my')->with('error', 'Este plantão não está mais disponível para aprovação.');
             }
 
-            // 1. Atualiza o plantão com o ID do candidato aprovado e muda o status
             $plantao->update([
                 'approved_profile_id' => $candidate->id,
                 'status' => 'preenchido',
             ]);
 
-            // 2. Remove todos os outros candidatos da tabela 'plantao_profile'
-            $plantao->candidates()->detach();
+            // --- LÓGICA DA NOTIFICAÇÃO ---
+            // 1. Encontra o objeto User do médico aprovado
+            $medicoUser = $candidate->user;
 
-            // 3. Redireciona de volta para a página de gerenciamento com uma mensagem de sucesso
+            // 2. Envia a notificação para este usuário
+            $medicoUser->notify(new MedicoAprovadoNotification($plantao));
+            // --- FIM DA LÓGICA DA NOTIFICAÇÃO ---
+
             return redirect()->route('plantoes.my')->with('success', 'Médico aprovado e plantão preenchido com sucesso!');
         }
 
 
-        
 }

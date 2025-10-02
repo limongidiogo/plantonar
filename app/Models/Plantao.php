@@ -29,6 +29,8 @@ class Plantao extends Model
         'end_time',
         'remuneration',
         'details',
+        'status',               
+        'approved_profile_id', 
     ];
 
     public function candidates()
