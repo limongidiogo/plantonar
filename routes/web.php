@@ -61,5 +61,23 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/plantoes/create', [PlantaoController::class, 'create'])->name('plantoes.create');
     Route::post('/plantoes', [PlantaoController::class, 'store'])->name('plantoes.store');
 });
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
+
+Route::get('/debug-db', function () {
+    // Pergunta 1: Qual arquivo de banco de dados você está usando?
+    $databasePath = DB::connection()->getDatabaseName();
+    dump("Caminho do Banco de Dados em uso:", $databasePath);
+
+    // Pergunta 2: Quais são as colunas da tabela 'profiles'?
+    $profileColumns = Schema::getColumnListing('profiles');
+    dump("Colunas na tabela 'profiles':", $profileColumns);
+
+    // Pergunta 3: Quais são as colunas da tabela 'documentos'?
+    $documentoColumns = Schema::getColumnListing('documentos');
+    dump("Colunas na tabela 'documentos':", $documentoColumns);
+});
+
+
 
 require __DIR__.'/auth.php';

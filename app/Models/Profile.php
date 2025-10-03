@@ -92,5 +92,15 @@ class Profile extends Model
         return $this->hasMany(Documento::class);
     }
 
+    /**
+     * Pega o documento específico da foto de perfil.
+     */
+    public function fotoPerfil()
+    {
+        // Define uma relação "um para um" com o modelo Documento,
+        // mas filtrando para pegar APENAS o documento cujo tipo é 'FOTO_PERFIL'.
+        return $this->hasOne(Documento::class)->where('tipo_documento', 'FOTO_PERFIL');
+    }   
+
 }
 

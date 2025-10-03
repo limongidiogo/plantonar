@@ -22,8 +22,14 @@
             <div class="hidden sm:flex sm:items-center sm:ms-6">
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
-                        <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
-                            <div>{{ Auth::user()->name }}</div>
+                        <button class="flex items-center text-sm font-medium text-gray-500 hover:text-gray-700 focus:outline-none transition duration-150 ease-in-out">
+                            {{-- Se o usuário tiver uma foto, mostre-a. Senão, mostre o nome. --}}
+                            @if (Auth::user()->profile->fotoPerfil)
+                                <img class="h-8 w-8 rounded-full object-cover" src="{{ Storage::url(Auth::user()->profile->fotoPerfil->caminho_arquivo) }}" alt="{{ Auth::user()->name }}">
+
+                            @else
+                                <div>{{ Auth::user()->name }}</div>
+                            @endif
 
                             <div class="ms-1">
                                 <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
@@ -34,11 +40,16 @@
                     </x-slot>
 
                     <x-slot name="content">
-                        <x-dropdown-link :href="route('profile.edit' )">
+                        {{-- Adicionando o nome do usuário no topo do dropdown --}}
+                        <div class="px-4 py-2 text-sm text-gray-700 border-b">
+                            <div>{{ Auth::user( )->name }}</div>
+                            <div class="font-medium text-xs text-gray-500">{{ Auth::user()->email }}</div>
+                        </div>
+
+                        <x-dropdown-link :href="route('profile.edit')">
                             {{ __('Meu Perfil') }}
                         </x-dropdown-link>
 
-                        {{-- CÓDIGO ADICIONADO AQUI (DESKTOP) --}}
                         <x-dropdown-link :href="route('profile.documents')">
                             {{ __('Meus Documentos') }}
                         </x-dropdown-link>
@@ -46,7 +57,6 @@
                         <!-- Authentication -->
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
-
                             <x-dropdown-link :href="route('logout')"
                                     onclick="event.preventDefault();
                                                 this.closest('form').submit();">
@@ -56,6 +66,8 @@
                     </x-slot>
                 </x-dropdown>
             </div>
+
+             
 
             <!-- Hamburger -->
             <div class="-me-2 flex items-center sm:hidden">

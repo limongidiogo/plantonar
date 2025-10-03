@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Auth; // Garante que o Facade Auth está importad
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;       // <-- LINHA DE DEPURAÇÃO ADICIONADA
+use Illuminate\Support\Facades\Schema;  // <-- LINHA DE DEPURAÇÃO ADICIONADA
 
 class ProfileController extends Controller
 {
@@ -117,29 +119,31 @@ class ProfileController extends Controller
     /**
      * Lida com o upload de um documento do usuário.
      */
-    public function uploadDocument(Request $request): RedirectResponse
-    {
-        $request->validate([
-            'tipo_documento' => ['required', 'string', 'in:FOTO_PERFIL,DIPLOMA_GRADUACAO'],
-            'documento' => ['required', 'file', 'mimes:jpg,png,pdf', 'max:2048'],
-        ]);
+   public function uploadDocument(Request $request): RedirectResponse
+{
+    $request->validate([
+        'tipo_documento' => ['required', 'string', 'in:FOTO_PERFIL,DIPLOMA_GRADUACAO'],
+        'documento' => ['required', 'file', 'mimes:jpg,png,pdf', 'max:2048'],
+    ]);
 
-        $profile = $request->user()->profile;
-        $file = $request->file('documento');
-        $tipoDocumento = $request->input('tipo_documento');
+    $profile = $request->user()->profile;
+    $file = $request->file('documento');
+    $tipoDocumento = $request->input('tipo_documento');
 
-        $path = $file->store('documentos/' . $profile->id, 'public');
+    $path = $file->store('documentos/' . $profile->id, 'public');
 
-        $profile->documentos()->updateOrCreate(
-            ['tipo_documento' => $tipoDocumento],
-            [
-                'caminho_arquivo' => $path,
-                'nome_original' => $file->getClientOriginalName(),
-                'extensao' => $file->getClientOriginalExtension(),
-            ]
-        );
+    // Salva ou atualiza o registro na tabela 'documentos' (A ÚNICA COISA QUE PRECISAMOS)
+    $profile->documentos()->updateOrCreate(
+        ['tipo_documento' => $tipoDocumento],
+        [
+            'caminho_arquivo' => $path,
+            'nome_original' => $file->getClientOriginalName(),
+            'extensao' => $file->getClientOriginalExtension(),
+        ]
+    );
 
-        return redirect()->route('profile.documents')->with('status', 'document-uploaded');
-    }
+    return redirect()->route('profile.documents')->with('status', 'document-uploaded');
 }
 
+
+}
