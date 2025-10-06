@@ -9,12 +9,14 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
+   public function up(): void
     {
         Schema::table('documentos', function (Blueprint $table) {
-            //
+            // Adiciona a coluna de status com valor padrão 'pendente'
+            $table->string('status')->default('pendente')->after('extensao');
         });
     }
+
 
     /**
      * Reverse the migrations.
@@ -22,7 +24,9 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('documentos', function (Blueprint $table) {
-            //
+            $table->dropColumn('status');
         });
     }
+
+    
 };

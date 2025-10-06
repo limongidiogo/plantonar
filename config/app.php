@@ -123,4 +123,6 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    'infosimples_token' => env('INFOSIMPLES_API_TOKEN'),
+
 ];

@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PlantaoController; // Movido para o topo para melhor organização
+use App\Services\CrmVerificationService;
 
 Route::get('/', function () {
     return view('welcome');
@@ -77,7 +78,5 @@ Route::get('/debug-db', function () {
     $documentoColumns = Schema::getColumnListing('documentos');
     dump("Colunas na tabela 'documentos':", $documentoColumns);
 });
-
-
 
 require __DIR__.'/auth.php';

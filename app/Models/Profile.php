@@ -30,6 +30,8 @@ class Profile extends Model
         'nacionalidade',
         'endereco_completo',
         'telefone_celular',
+        'uf',
+        'crm_status',
     ];
 
     /**

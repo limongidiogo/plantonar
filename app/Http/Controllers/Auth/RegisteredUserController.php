@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB; // Importante: para usar transações
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
+use App\Services\CrmVerificationService;
 
 class RegisteredUserController extends Controller
 {
@@ -36,14 +37,15 @@ class RegisteredUserController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'user_type' => ['required', 'in:medico,hospital'], // Valida o tipo de usuário
+            'user_type' => ['required', 'in:medico,hospital'],
         ];
 
         // 2. Adicionar regras de validação específicas baseadas no tipo de usuário
         $specificRules = [];
         if ($request->input('user_type') === 'medico') {
             $specificRules = [
-                'crm' => ['required', 'string', 'max:20', 'unique:profiles,crm'],
+                'uf' => ['required', 'string', 'size:2'], // Validação para o campo UF
+                'crm' => ['required', 'string', 'max:20'],
                 'specialty' => ['required', 'string', 'max:100'],
             ];
         } elseif ($request->input('user_type') === 'hospital') {
@@ -53,19 +55,43 @@ class RegisteredUserController extends Controller
             ];
         }
 
-        // 3. Juntar as regras e validar
-        $request->validate(array_merge($baseRules, $specificRules));
+        // 3. Juntar as regras e criar o validador
+        $validator = \Illuminate\Support\Facades\Validator::make(
+            $request->all(),
+            array_merge($baseRules, $specificRules)
+        );
 
-        // 4. Usar uma transação para garantir a consistência dos dados
+        // 4. Adicionar a lógica de verificação de CRM via API
+        $validator->after(function ($validator) use ($request) {
+            // Executa apenas se for um médico e os campos CRM/UF existirem
+            if ($request->input('user_type') === 'medico' && $request->filled(['crm', 'uf'])) {
+                
+                $service = new CrmVerificationService();
+                $status = $service->verify($request->input('crm'), $request->input('uf'));
+
+                // Se o status retornado pela API não for 'regular', adiciona um erro
+                if ($status !== 'regular') {
+                    $validator->errors()->add(
+                        'crm', // O erro aparecerá abaixo do campo CRM
+                        'O CRM informado não pôde ser validado ou encontra-se irregular. Verifique os dados ou tente novamente mais tarde.'
+                    );
+                }
+            }
+        });
+
+        // 5. Executar a validação
+        $validator->validate(); // Dispara a validação. Se falhar, ele redireciona automaticamente.
+
+        // 6. Usar uma transação para garantir a consistência dos dados
         $user = DB::transaction(function () use ($request) {
-            // 4.1. Criar o Usuário
+            // 6.1. Criar o Usuário
             $user = User::create([
                 'name' => $request->name,
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
             ]);
 
-            // 4.2. Preparar e Criar o Perfil
+            // 6.2. Preparar e Criar o Perfil
             $profileData = [
                 'user_id' => $user->id,
                 'user_type' => $request->user_type,
@@ -73,13 +99,15 @@ class RegisteredUserController extends Controller
 
             if ($request->user_type === 'medico') {
                 $profileData['crm'] = $request->crm;
+                $profileData['uf'] = $request->uf; // Salva a UF no perfil
                 $profileData['specialty'] = $request->specialty;
+                $profileData['crm_status'] = 'verified'; // Marca o CRM como verificado
             } else {
                 $profileData['hospital_name'] = $request->hospital_name;
                 $profileData['cnpj'] = $request->cnpj;
             }
 
-            // Usando a relação que criamos para criar o perfil
+            // Usando a relação para criar o perfil
             $user->profile()->create($profileData);
 
             return $user;

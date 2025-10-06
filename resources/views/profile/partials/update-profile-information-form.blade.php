@@ -46,18 +46,36 @@
                 </div>
             @endif
         </div>
+        
         {{-- Verifica o tipo de usuário a partir do perfil --}}
         @if ($profile->user_type === 'medico')
-            {{-- Campos para o Médico --}}
-            <div class="mt-4">
-                <x-input-label for="crm" :value="__('CRM')" />
-                <x-text-input id="crm" name="crm" type="text" class="mt-1 block w-full" :value="old('crm', $profile->crm)" required autofocus autocomplete="crm" />
-                <x-input-error class="mt-2" :messages="$errors->get('crm')" />
+            
+            {{-- ================================================================== --}}
+            {{-- │ INÍCIO DA ALTERAÇÃO: Bloco combinado para CRM e UF             │ --}}
+            {{-- ================================================================== --}}
+            <div class="grid grid-cols-3 gap-4">
+                {{-- Coluna do CRM (ocupando 2/3 do espaço) --}}
+                <div class="col-span-2">
+                    <x-input-label for="crm" :value="__('CRM')" />
+                    <x-text-input id="crm" name="crm" type="text" class="mt-1 block w-full" :value="old('crm', $profile->crm)" required autocomplete="crm" />
+                    <x-input-error class="mt-2" :messages="$errors->get('crm')" />
+                </div>
+
+                {{-- Coluna da UF (ocupando 1/3 do espaço) --}}
+                <div>
+                    <x-input-label for="uf" :value="__('UF')" />
+                    {{-- Usando x-text-input para manter a consistência visual --}}
+                    <x-text-input id="uf" name="uf" type="text" class="mt-1 block w-full" :value="old('uf', $profile->uf)" required autocomplete="state" />
+                    <x-input-error class="mt-2" :messages="$errors->get('uf')" />
+                </div>
             </div>
+            {{-- ================================================================== --}}
+            {{-- │ FIM DA ALTERAÇÃO                                               │ --}}
+            {{-- ================================================================== --}}
 
             <div class="mt-4">
                 <x-input-label for="specialty" :value="__('Especialidade')" />
-                <x-text-input id="specialty" name="specialty" type="text" class="mt-1 block w-full" :value="old('specialty', $profile->specialty)" required autofocus autocomplete="specialty" />
+                <x-text-input id="specialty" name="specialty" type="text" class="mt-1 block w-full" :value="old('specialty', $profile->specialty)" required autocomplete="specialty" />
                 <x-input-error class="mt-2" :messages="$errors->get('specialty')" />
             </div>
 
@@ -93,7 +111,8 @@
 
         <div class="mt-4">
             <x-input-label for="cpf" :value="__('CPF')" />
-            <x-text-input id="cpf" name="cpf" type="text" class="mt-1 block w-full" :value="old('cpf', $profile->cpf)" />
+            <x-text-input id="cpf" name="cpf" type="text" class="mt-1 block w-full" 
+              :value="old('cpf', $profile->cpf ? '********' . substr($profile->cpf, -3) : '')" placeholder="Preencha seu CPF" :disabled="!empty($profile->cpf)" />
             <x-input-error class="mt-2" :messages="$errors->get('cpf')" />
         </div>
 
@@ -125,3 +144,4 @@
         </div>
     </form>
 </section>
+

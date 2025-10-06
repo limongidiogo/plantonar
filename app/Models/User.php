@@ -2,23 +2,21 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Contracts\Auth\MustVerifyEmail; // 1. Garanta que esta linha está aqui e descomentada
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-
-class User extends Authenticatable
+// 2. Adicione "implements MustVerifyEmail" aqui
+class User extends Authenticatable implements MustVerifyEmail
 {
-
-    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasApiTokens, HasFactory, Notifiable;
 
     /**
      * The attributes that are mass assignable.
      *
-     * @var list<string>
+     * @var array<string>
      */
     protected $fillable = [
         'name',
@@ -29,21 +27,20 @@ class User extends Authenticatable
     /**
      * The attributes that should be hidden for serialization.
      *
-     * @var list<string>
+     * @var array<string>
      */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-
     /**
      * Get the profile associated with the user.
     */
     public function profile()
-        {   
-            return $this->hasOne(Profile::class);
-        }
+    {   
+        return $this->hasOne(Profile::class);
+    }
  
     /**
      * Get the attributes that should be cast.
@@ -57,5 +54,5 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
-
 }
+
